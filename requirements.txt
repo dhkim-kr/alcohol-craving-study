@@ -1,0 +1,34 @@
+# Core scientific stack
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+joblib
+tqdm
+
+# Signal processing / feature extraction
+neurokit2
+
+# Machine learning
+scikit-learn
+xgboost
+shap
+
+# Statistics (linear mixed models)
+statsmodels
+# LMM fitting in notebooks/08 uses pymer4, which wraps R's lme4/emmeans via rpy2.
+# Requires a working R installation (>=4.x) with these R packages installed:
+#   install.packages(c("lme4","emmeans","lmerTest","tibble","broom",
+#                       "broom.mixed","insight","parameters","performance","report"))
+# IMPORTANT: pymer4>=0.9 rewrote its API (no more `Lmer` class) and will break
+# notebooks/08's LMM cells. Pin to 0.8.2, the last release with the classic API
+# this notebook was written against (verified working: docs/VERIFICATION_REPORT.md).
+pymer4==0.8.2
+rpy2
+
+# Figure 11 (circos-style physiomarker plot)
+pycirclize
+
+# TODO: remaining versions were not pinned in the original research
+# environment. Freeze them (`pip freeze`) once fully validated end-to-end.

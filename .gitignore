@@ -1,0 +1,39 @@
+.vscode/
+data/
+build/
+dist/
+__pycache__/
+.venv/
+.idea/
+
+!data/
+data/*
+!data/alcohol_Qscores.csv
+!data/alcohol_scenarios.csv
+!data/README.md
+save/
+
+# personal / experimental notebooks
+notebooks/mslee_GSR.ipynb
+notebooks/mslee
+
+runs/
+
+# regenerable result/data outputs that notebooks happen to write inside
+# notebooks/ instead of the gitignored runs/ dir (re-running the relevant
+# notebook cell regenerates all of these; nothing here is source code)
+notebooks/lmm_results/
+notebooks/lmm_sensitivity_results/
+notebooks/feature_pair_comparison/
+notebooks/hybrid_session_plots_with_saved_lmm_csv/
+notebooks/feature_rank_summary.csv
+notebooks/eda_scr_peaks.png
+
+# quarantined: unused / superseded / out-of-scope code & data
+legacy/
+.ipynb_checkpoints/
+*.pyc
+__pycache__/
+
+# verification run logs (not code)
+logs/
