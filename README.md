@@ -1,5 +1,12 @@
 # Multimodal Candidate Physiomarkers of VR-Elicited Graded Alcohol Craving
 
+## Status
+
+| Item | Status |
+|---|---|
+| Research | Submitted · IEEE Journal of Biomedical and Health Informatics |
+| Implementation | Preprocessing, feature extraction, LMM, classification, and SHAP analysis |
+
 Submitted to the IEEE Journal of Biomedical and Health Informatics. This repository contains signal preprocessing, feature extraction, statistical analysis, and machine-learning notebooks.
 
 ## Study and analysis
@@ -36,7 +43,7 @@ A clinician-supervised VR cue-exposure study in 50 patients with Alcohol Use Dis
 │                                 #   raw -> preprocessed -> feature pipeline end-to-end (no real data needed)
 ├── data/            # labels, scenario metadata, Q-score CSVs (see data/README.md)
 ├── docs/paper_code_mapping.md   # section-by-section mapping from the paper to this code
-└── legacy/          # quarantined unused/superseded/out-of-scope code (gitignored, not part of this release)
+└── legacy/          # unused analysis code (gitignored, not part of this release)
 ```
 
 **No pre-extracted feature tables are included in this repository** — only the code that produces them. See "Running the pipeline" below.
@@ -53,17 +60,17 @@ The LMM analysis (`notebooks/05_ml_classification_lmm_shap.ipynb`) uses `pymer4=
 - These R packages: `install.packages(c("lme4","emmeans","lmerTest","tibble","broom","broom.mixed","insight","parameters","performance","report"))`
 - Build tools for `rpy2`/`lme4` from source: a C/C++ toolchain, `cmake`, BLAS/LAPACK + Fortran (`gfortran`), and R's own dev headers — see your distro's equivalents of `libpcre2-dev`, `libdeflate-dev`, `liblzma-dev`, `libbz2-dev`, `zlib1g-dev`, `libicu-dev`, `python3-dev`, `libblas-dev`, `liblapack-dev`.
 
-## Verifying the code works (no real data required)
+## Smoke test
 
 ```bash
 python tests/test_pipeline_smoke.py
 ```
 
-This generates small synthetic (but physiologically realistic, via `neurokit2`'s own signal simulators) ECG/PPG/EDA recordings in the exact folder/column layout `BioSignalDataset` expects, and runs the complete raw -> preprocessing -> windowed-feature pipeline against them, asserting that HR/HRV/EDA/PTT feature families all come out non-empty. This does **not** validate the paper's actual numbers (it uses fabricated signals) — it only confirms the extraction code itself runs correctly end-to-end without needing access to the restricted patient dataset.
+The smoke test generates synthetic ECG, PPG, and EDA signals and checks the raw-signal-to-feature pipeline, including HR, HRV, EDA, and PTT feature families. Clinical benchmark reproduction requires the study data.
 
 ## Data preparation
 
-See [`data/README.md`](data/README.md) for what's included vs. what must be supplied separately (raw physiological recordings are not redistributed here — see the IRB note there). In short:
+Data schema and access scope: [`data/README.md`](data/README.md).
 1. Point the raw-signal loader at your own copy of the split-trial CSV export (see `data/README.md` for the expected folder layout — the same layout `tests/test_pipeline_smoke.py` synthesizes).
 2. The tracked `data/alcohol_Qscores.csv` and `data/alcohol_scenarios.csv` provide metadata. Craving labels at `data/labels/alcohol.json` are not included and must be supplied separately; see `data/README.md`.
 
@@ -71,7 +78,7 @@ See [`data/README.md`](data/README.md) for what's included vs. what must be supp
 
 The pipeline is notebook-driven. Run the notebooks in their numeric order — it reflects true data dependency (notebook 02 needs notebook 01's PTT output), not just topic:
 
-1. **Feature extraction**: `notebooks/01_feature_extraction.ipynb` — loads raw signals via `BioSignalDataset`, extracts the 152 features per 10s/50%-overlap window with the paper's PTT window (`ptt_range=(0.05, 0.7)`), and writes `features_all_10s_05_70_3.csv` under `runs/07_final_report/` (git-ignored — this is regenerated locally, not shipped in the repo; the directory keeps its original internal name for continuity with earlier verification scripts). The notebook's own later cells (below the "Feature Extraction" boundary marked inside it) are a preliminary ML sweep superseded by step 5 below — kept for historical reference, not part of the reported results.
+1. **Feature extraction**: `notebooks/01_feature_extraction.ipynb` — loads raw signals via `BioSignalDataset`, extracts the 152 features per 10s/50%-overlap window with the paper's PTT window (`ptt_range=(0.05, 0.7)`), and writes `features_all_10s_05_70_3.csv` under `runs/07_final_report/` (generated locally; git-ignored). The notebook's own later cells (below the "Feature Extraction" boundary marked inside it) are a preliminary ML sweep superseded by step 5 below; use step 5 for the final analysis.
 2. **QC**: `notebooks/02_abnormal_modality_sessions.ipynb` — identifies sessions/modalities to exclude (metadata errors, missing PPG/EDA); depends on step 1's PTT output.
 3. **Label sanity checks**: `notebooks/03_label_and_scenario_sanity_checks.ipynb`.
 4. **Correlation analysis**: `notebooks/04_biomarker_spearman_correlations.ipynb` — QC feature filtering (used downstream) plus an exploratory correlation pass (not in the paper).
